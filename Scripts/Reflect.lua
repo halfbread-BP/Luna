@@ -4,7 +4,7 @@ Reflect = {}
   awake() - Called upon runtime
   start() - called once before the first update
   update(dt) - runs every frame
-  fixedUpdate(fixedDt) - called at fixed intervals (Defaults to 50Hz in 'Config/Config.lua')
+  fixedUpdate(fixedDt) - called at fixed intervals (Defaults to 50Hz in 'Scripts/ScriptManager.lua')
   lateUpdate(dt) - called once every frame after an update has been finished
   draw() - use for drawing graphics
 ]]
