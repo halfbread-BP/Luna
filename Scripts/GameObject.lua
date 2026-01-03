@@ -11,7 +11,7 @@ function GameObject:new(name)
   setmetatable(gameObject, GameObject)
 
   -- Assign a GameObject the Transform component
-  gameObject:addComponent(transform)
+  gameObject.transform = gameObject:addComponent(Transform)
 
   return gameObject
 end
