@@ -75,3 +75,5 @@ function ScriptManager:draw()
         end
     end
 end
+
+return ScriptManager
