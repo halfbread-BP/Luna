@@ -10,3 +10,7 @@ Plans:
   * More Built-in Components
   * Scenes and Scene Management
   * Utilities and Helpers
+
+---
+
+This Framework is very early in development and is not ready for use
