@@ -1,6 +1,6 @@
-require("Component")
-require("Transform")
-require("GameObject")
+require("Scripts/Component")
+require("Scripts/Transform")
+require("Scripts/GameObject")
 ScriptManager = require("Scripts/ScriptManager")
 
 local scriptManager
