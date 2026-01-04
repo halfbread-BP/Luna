@@ -6,7 +6,8 @@ ScriptManager.__index = ScriptManager
 function ScriptManager:new()
   local obj = {
     scripts = {},
-    fixedTimeStep = 1/50, -- change here if u want
+    gameObjects = {},
+    fixedTimeStep = 1/50,
     fixedAccumulator = 0
   }
   setmetatable(obj, ScriptManager)
@@ -20,10 +21,27 @@ function ScriptManager:registerScript(script)
     return script
 end
 
+function ScriptManager:registerGameObject(gameObject)
+    gameObject._awoken = false
+    gameObject._started = false
+    table.insert(self.gameObjects, gameObject)
+    return gameObject
+end
+
 function ScriptManager:removeScript(script)
     for i, s in ipairs(self.scripts) do
         if s == script then
             table.remove(self.scripts, i)
+            return true
+        end
+    end
+    return false
+end
+
+function ScriptManager:removeGameObject(gameObject)
+    for i, go in ipairs(self.gameObjects) do
+        if go == gameObject then
+            table.remove(self.gameObjects, i)
             return true
         end
     end
@@ -37,14 +55,36 @@ function ScriptManager:update(dt)
             script._awoken = true
         end
     end
-
+    
+    for _, go in ipairs(self.gameObjects) do
+        if go.active and not go._awoken then
+            for _, component in ipairs(go.components) do
+                if component.enabled and Reflect.hasMethod(component, "awake") then
+                    component:awake()
+                end
+            end
+            go._awoken = true
+        end
+    end
+    
     for _, script in ipairs(self.scripts) do
         if not script._started and Reflect.hasMethod(script, "start") then
             script:start()
             script._started = true
         end
     end
-
+    
+    for _, go in ipairs(self.gameObjects) do
+        if go.active and not go._started then
+            for _, component in ipairs(go.components) do
+                if component.enabled and Reflect.hasMethod(component, "start") then
+                    component:start()
+                end
+            end
+            go._started = true
+        end
+    end
+    
     self.fixedAccumulator = self.fixedAccumulator + dt
     while self.fixedAccumulator >= self.fixedTimeStep do
         for _, script in ipairs(self.scripts) do
@@ -52,18 +92,49 @@ function ScriptManager:update(dt)
                 script:fixedUpdate(self.fixedTimeStep)
             end
         end
+        
+        for _, go in ipairs(self.gameObjects) do
+            if go.active then
+                for _, component in ipairs(go.components) do
+                    if component.enabled and Reflect.hasMethod(component, "fixedUpdate") then
+                        component:fixedUpdate(self.fixedTimeStep)
+                    end
+                end
+            end
+        end
+        
         self.fixedAccumulator = self.fixedAccumulator - self.fixedTimeStep
     end
-
+    
     for _, script in ipairs(self.scripts) do
         if Reflect.hasMethod(script, "update") then
             script:update(dt)
         end
     end
-
+    
+    for _, go in ipairs(self.gameObjects) do
+        if go.active then
+            for _, component in ipairs(go.components) do
+                if component.enabled and Reflect.hasMethod(component, "update") then
+                    component:update(dt)
+                end
+            end
+        end
+    end
+    
     for _, script in ipairs(self.scripts) do
         if Reflect.hasMethod(script, "lateUpdate") then
             script:lateUpdate(dt)
+        end
+    end
+
+    for _, go in ipairs(self.gameObjects) do
+        if go.active then
+            for _, component in ipairs(go.components) do
+                if component.enabled and Reflect.hasMethod(component, "lateUpdate") then
+                    component:lateUpdate(dt)
+                end
+            end
         end
     end
 end
@@ -72,6 +143,16 @@ function ScriptManager:draw()
     for _, script in ipairs(self.scripts) do
         if Reflect.hasMethod(script, "draw") then
             script:draw()
+        end
+    end
+
+    for _, go in ipairs(self.gameObjects) do
+        if go.active then
+            for _, component in ipairs(go.components) do
+                if component.enabled and Reflect.hasMethod(component, "draw") then
+                    component:draw()
+                end
+            end
         end
     end
 end
