@@ -36,8 +36,8 @@ end
 function love.draw()
   love.graphics.print("Luna Framework", 10, 10)
   love.graphics.print("FPS: " .. love.timer.getFPS(), 10, 30)
-  love.graphics.print("Hold down [SPACE] to disable the GameObject")
-  love.graphics.print("Press [esc] to Exit")
+  love.graphics.print("Hold down [SPACE] to disable the GameObject", 10, 50)
+  love.graphics.print("Press [esc] to Exit", 10, 70)
 end
   
 function love.keypressed(key)
